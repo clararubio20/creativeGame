@@ -28,6 +28,10 @@ void setup()
   background(fondo);
   cangreburguers = new ArrayList<Cangreburguer>();
   peces = new ArrayList<Pez_Hambriento>();
+  for(int i= 0; i<4;i++)
+  {
+    creaPez_Hambriento(i);
+  }
   pecesPidiendo = new int[4];
   cangreburguersConseguidas = new int[4];
   for(int i = 0; i<4;i++){
@@ -80,7 +84,10 @@ void draw()
   for (int i = 0; i<peces.size(); i++)
   {
     Pez_Hambriento j = peces.get(i);
-    j.draw();
+    if(pecesPidiendo[i]==1)
+    {
+      j.draw();
+    }
     if(cangreburguersConseguidas[i]!=0)
     {
       j.ComeCangreburguer();
@@ -88,7 +95,7 @@ void draw()
     }
     if(j.estoyLleno() == 1)
     {
-      peces.remove(i);
+      j.meVoy();
       pecesPidiendo[i]=0;
     }
   }
@@ -99,7 +106,8 @@ void draw()
     int pez_libre = 0;
     while((pez_libre < 4) && (encontrado == 0))
     {
-      if(pecesPidiendo[pez_libre] == 0){
+      if(pecesPidiendo[pez_libre] == 0)
+      {
         encontrado = 1;
         pecesPidiendo[pez_libre] = 1;
       }
@@ -108,10 +116,6 @@ void draw()
         pez_libre++;
       }
       tiempo_anterior = millis();
-    }
-    if(encontrado == 1)
-    {
-      creaPez_Hambriento(pez_libre);
     }
   }
 }
@@ -128,7 +132,7 @@ void serialEvent(Serial p)
   //println(datoS);
   if (datoS.equals("Knock!"))
   {
-      creaCangreburguer(int(random(0,width)),height-100);
+      //creaCangreburguer(int(random(0,width)),height-100);
   }
 }
 
