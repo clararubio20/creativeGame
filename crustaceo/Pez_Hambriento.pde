@@ -51,4 +51,17 @@ class Pez_Hambriento
       return 0;
     }
   }
+  
+  //Devuelve 1 si la cangreburguer se encuentra en el espacio del personaje
+  int esMia(float posX)
+  {
+    if(posX >= _princEsp[_personaje] && posX <= _finalEsp[_personaje])
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
 }
