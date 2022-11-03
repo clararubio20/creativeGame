@@ -28,6 +28,10 @@ class Pez_Hambriento
       _obtenidas[_personaje]=_obtenidas[_personaje]+1;
     }
   }
+  void meVoy()
+  {
+    _obtenidas[_personaje] = 0;
+  }
   int estoyLleno(){
     if(_obtenidas[_personaje]==_cpedidas[_personaje]){
       return 1;
