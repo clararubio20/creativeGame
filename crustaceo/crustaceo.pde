@@ -1,25 +1,23 @@
-// Luis Molina-Tanco - 2021. 
+//
+// Clara Rubio Almagro y Laura Sánchez Sánchez 
 // 
-// Ejemplo uso puerto serie. 
+// Código de ejercicio de la asignatura electrónica creatima de la ETSIT UMA
 //
-// Este programa está pensado para funcionar con un arduino
-// que esté ejecutando el ejemplo Knock, que se puede
-// ver aquí:
+// Simula el típico juego de preparación de comida mediante el uso de un piezoeléctrico
+// conectado a un arduino
 //
-// https://www.arduino.cc/en/Tutorial/BuiltInExamples/Knock
 
 PImage fondo;
 import processing.serial.*;
 ArrayList<Cangreburguer> cangreburguers;
 ArrayList<Pez_Hambriento> peces;
 Serial myPort;
-int cont = 0;
 long tiempo_anterior = 0;
 long periodo = 3000;
 int[] pecesPidiendo;
-int[] cangreburguersConseguidas;
 float[] _princEsp = {275,600,950,1250};
 float[] _finalEsp = {525,900,1200,1600};
+int NUM_PECES = 4;
 
 void setup()
 {
@@ -33,10 +31,8 @@ void setup()
     creaPez_Hambriento(i);
   }
   pecesPidiendo = new int[4];
-  cangreburguersConseguidas = new int[4];
   for(int i = 0; i<4;i++){
     pecesPidiendo[i] = 0;
-    cangreburguersConseguidas[i] = 0;
   }
   printArray(Serial.list());
   myPort = new Serial(this, Serial.list()[0], 9600); 
@@ -58,45 +54,42 @@ void draw()
     }
     else if(g.posY()<400)
     {
-      if(g.posX()<525 && g.posX()>275 && pecesPidiendo[0] == 1)
+      if(pecesPidiendo[0] == 1 && peces.get(0).esMia(g.posX()) == 1)
       {
-        cangreburguersConseguidas[0]++;
+        peces.get(0).ComeCangreburguer();
         cangreburguers.remove(i);
       }
-      else if(g.posX()<900 && g.posX()>600 && pecesPidiendo[1] == 1)
+      else if(pecesPidiendo[1] == 1 && peces.get(1).esMia(g.posX()) == 1)
       {
-        cangreburguersConseguidas[1]++;
+        peces.get(1).ComeCangreburguer();
         cangreburguers.remove(i);
       }
-      else if(g.posX()<1200 && g.posX()>950 && pecesPidiendo[2] == 1)
+      else if(pecesPidiendo[2] == 1 && peces.get(2).esMia(g.posX()) == 1)
       {
-        cangreburguersConseguidas[2]++;
+        peces.get(2).ComeCangreburguer();
         cangreburguers.remove(i);
       }
-      else if(g.posX()<1600 && g.posX()>1250 && pecesPidiendo[3] == 1)
+      else if(pecesPidiendo[3] == 1 && peces.get(3).esMia(g.posX()) == 1)
       {
-        cangreburguersConseguidas[3]++;
+        peces.get(3).ComeCangreburguer();
         cangreburguers.remove(i);
       }
-      
     }
   }
-  for (int i = 0; i<peces.size(); i++)
+  
+  for (int i = 0; i< NUM_PECES; i++)
   {
     Pez_Hambriento j = peces.get(i);
+    
     if(pecesPidiendo[i]==1)
     {
       j.draw();
     }
-    if(cangreburguersConseguidas[i]!=0)
-    {
-      j.ComeCangreburguer();
-      cangreburguersConseguidas[i]--;
-    }
+    
     if(j.estoyLleno() == 1)
     {
       j.meVoy();
-      pecesPidiendo[i]=0;
+      pecesPidiendo[i] = 0;
     }
   }
   
@@ -104,7 +97,7 @@ void draw()
   {
     int encontrado=0;
     int pez_libre = 0;
-    while((pez_libre < 4) && (encontrado == 0))
+    while((pez_libre < NUM_PECES) && (encontrado == 0))
     {
       if(pecesPidiendo[pez_libre] == 0)
       {
@@ -122,7 +115,7 @@ void draw()
 
 void mousePressed()
 {
- creaCangreburguer(mouseX,mouseY); 
+ creaCangreburguer(); 
 }
 
 void serialEvent(Serial p)
@@ -132,11 +125,11 @@ void serialEvent(Serial p)
   //println(datoS);
   if (datoS.equals("Knock!"))
   {
-      //creaCangreburguer(int(random(0,width)),height-100);
+      //creaCangreburguer(int();
   }
 }
 
-void creaCangreburguer(int x, int y)
+void creaCangreburguer()
 {
   cangreburguers.add(new Cangreburguer(random(2,5),
     mouseX, 
