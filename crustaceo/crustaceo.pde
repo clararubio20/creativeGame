@@ -8,10 +8,11 @@
 //
 
 import processing.sound.*;
-SoundFile sonido_cocinado;
-SoundFile mmm;
-int numsounds = 3;
-PImage fondo;                                //Guarda el fondo de pantalla
+SoundFile sonido_cocinado;                   //Sonido que hace la hamburguesa al cocinarse
+SoundFile mmm;                               //Sonido que hacen los peces al irse
+int numsounds = 3;                           //Número de sonidos que hacen los peces al irse
+PImage[] fondo;                              //Guarda el fondo de pantalla
+int cont_estrellas = 0;                      //Contador de la puntuación
 import processing.serial.*;
 ArrayList<Cangreburguer> cangreburguers;     //Guarda todas las cangreburguers que se creen
 ArrayList<Pez_Hambriento> peces;             //Guarda los 4 peces hambrientos de la escena
@@ -25,8 +26,13 @@ int cont_peces_satisfechos = 0;              //Cuenta el número de peces que ya
 void setup()
 {
   size(2166,1080);                           //Tamaño de la imagen de fondo
-  fondo = loadImage("fondo.jpg");            //Carga la imagen de fondo
-  background(fondo);                         //Muestra la imagen de fondo
+  fondo = new PImage[4];
+  fondo[0] = loadImage("fondo.jpg");         //Carga la imagen de fondo
+  fondo[1] = loadImage("fondo1.jpg");        //Carga la imagen de fondo con una estrella
+  fondo[2] = loadImage("fondo2.jpg");        //Carga la imagen de fondo con dos estrella
+  fondo[3] = loadImage("fondo3.jpg");        //Carga la imagen de fondo con tres estrella
+  background(fondo[cont_estrellas]);         //Muestra la imagen de fondo
+  
   
   textSize(35);                              //Tamaño del texto
   
@@ -57,7 +63,7 @@ void setup()
 
 void draw()
 {
-  background(fondo);  //Carga la imagen de fondo para que esté siempre por debajo de los objetos que se crean
+  background(fondo[cont_estrellas]);  //Carga la imagen de fondo para que esté siempre por debajo de los objetos que se crean
   
   if(cont_peces_satisfechos >= 10)
   {
@@ -88,9 +94,18 @@ void draw()
       cont_peces_satisfechos++;
     }
     
+    //Si consigue 10 clientes más, consigue 1 estrella más
     if(cont_peces_satisfechos == 10)
     {
-      exit();
+      cont_estrellas = 1;
+    }
+    else if(cont_peces_satisfechos == 20)
+    {
+      cont_estrellas = 2;
+    }
+    else if(cont_peces_satisfechos == 30)
+    {
+      cont_estrellas = 3;
     }
   }
   
