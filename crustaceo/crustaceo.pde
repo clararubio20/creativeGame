@@ -7,21 +7,28 @@
 // conectado a un arduino
 //
 
+import processing.sound.*;
+SoundFile sonido_cocinado;
+SoundFile mmm;
+int numsounds = 3;
 PImage fondo;                                //Guarda el fondo de pantalla
 import processing.serial.*;
 ArrayList<Cangreburguer> cangreburguers;     //Guarda todas las cangreburguers que se creen
 ArrayList<Pez_Hambriento> peces;             //Guarda los 4 peces hambrientos de la escena
 Serial myPort;
 long tiempo_anterior = 0;                    //Guarda la última vez que un pez entró al crustaceo
-long periodo = 3000;                         //Periodo de aparición de nuevos peces
+long periodo = 2000;                         //Periodo de aparición de nuevos peces
 int[] pecesPidiendo;                         //Array que guarda si los peces están en escena (1) o no están pidiendo (0)
 int NUM_PECES = 4;                           //Número de peces máximo
+int cont_peces_satisfechos = 0;              //Cuenta el número de peces que ya se han ido
 
 void setup()
 {
   size(2166,1080);                           //Tamaño de la imagen de fondo
   fondo = loadImage("fondo.jpg");            //Carga la imagen de fondo
   background(fondo);                         //Muestra la imagen de fondo
+  
+  textSize(35);                              //Tamaño del texto
   
   cangreburguers = new ArrayList<Cangreburguer>();    //Crea el array de tipo cangreburguer
   peces = new ArrayList<Pez_Hambriento>();            //Crea el array de tipo pez hambriento
@@ -38,6 +45,10 @@ void setup()
     pecesPidiendo[i] = 0;
   }
   
+  //mmm = new SoundFile(this,"nam.aiff");
+  sonido_cocinado = new SoundFile(this,"sonido_carne.aiff");
+  
+  
   printArray(Serial.list());
   myPort = new Serial(this, Serial.list()[0], 9600); 
   myPort.bufferUntil(10);
@@ -47,6 +58,15 @@ void setup()
 void draw()
 {
   background(fondo);  //Carga la imagen de fondo para que esté siempre por debajo de los objetos que se crean
+  
+  if(cont_peces_satisfechos >= 10)
+  {
+    text(cont_peces_satisfechos, 1115, 60);    //Escribe el número de peces satisfechos en el marcador ajustado a valores de dos cifras
+  }
+  else 
+  {
+    text(cont_peces_satisfechos, 1127, 60);    //Escribe el número de peces satisfechos en el marcador ajustado a valores de una cifra
+  }
   
   for (int i = 0; i< NUM_PECES; i++)
   {
@@ -62,7 +82,15 @@ void draw()
     if(j.estoyLleno() == 1)
     {
       j.meVoy();
+      mmm = new SoundFile(this,(int)random(1,numsounds+1) + ".aiff");
+      mmm.play();
       pecesPidiendo[i] = 0;
+      cont_peces_satisfechos++;
+    }
+    
+    if(cont_peces_satisfechos == 10)
+    {
+      exit();
     }
   }
   
@@ -154,6 +182,8 @@ void creaCangreburguer()
     0.0, 
     0.0));
     println(cangreburguers.size());
+    
+    sonido_cocinado.play();
 }
 
 //Crea el pez pasado por parámetro (según su posición de izquierda a derecha)
