@@ -13,11 +13,16 @@ SoundFile mmm;                               //Sonido que hacen los peces al irs
 int numsounds = 3;                           //Número de sonidos que hacen los peces al irse
 PImage[] fondo;                              //Guarda el fondo de pantalla
 int cont_estrellas = 0;                      //Contador de la puntuación
+PImage fondo_comienzo;
+int comienzo = 0;
+int segundos = 60;
+int segundo = 1000;
+long tiempo_anterior2;                    //Guarda la última vez que un pez entró al crustaceo
 import processing.serial.*;
 ArrayList<Cangreburguer> cangreburguers;     //Guarda todas las cangreburguers que se creen
 ArrayList<Pez_Hambriento> peces;             //Guarda los 4 peces hambrientos de la escena
 Serial myPort;
-long tiempo_anterior = 0;                    //Guarda la última vez que un pez entró al crustaceo
+long tiempo_anterior;                    //Guarda la última vez que un pez entró al crustaceo
 long periodo = 2000;                         //Periodo de aparición de nuevos peces
 int[] pecesPidiendo;                         //Array que guarda si los peces están en escena (1) o no están pidiendo (0)
 int NUM_PECES = 4;                           //Número de peces máximo
@@ -26,13 +31,14 @@ int cont_peces_satisfechos = 0;              //Cuenta el número de peces que ya
 void setup()
 {
   size(2166,1080);                           //Tamaño de la imagen de fondo
+  fondo_comienzo = loadImage("fondo_principio.jpg");
+    
   fondo = new PImage[4];
   fondo[0] = loadImage("fondo.jpg");         //Carga la imagen de fondo
   fondo[1] = loadImage("fondo1.jpg");        //Carga la imagen de fondo con una estrella
   fondo[2] = loadImage("fondo2.jpg");        //Carga la imagen de fondo con dos estrella
   fondo[3] = loadImage("fondo3.jpg");        //Carga la imagen de fondo con tres estrella
   background(fondo[cont_estrellas]);         //Muestra la imagen de fondo
-  
   
   textSize(35);                              //Tamaño del texto
   
@@ -51,8 +57,9 @@ void setup()
     pecesPidiendo[i] = 0;
   }
   
-  //mmm = new SoundFile(this,"nam.aiff");
   sonido_cocinado = new SoundFile(this,"sonido_carne.aiff");
+  
+  tiempo_anterior = 0;
   
   
   printArray(Serial.list());
@@ -63,7 +70,28 @@ void setup()
 
 void draw()
 {
+  if(comienzo == 0)
+  {
+    background(fondo_comienzo);
+  }
+  else
+  {
   background(fondo[cont_estrellas]);  //Carga la imagen de fondo para que esté siempre por debajo de los objetos que se crean
+  
+  if(millis() - tiempo_anterior2 > segundo)
+  {
+    segundos--;
+    tiempo_anterior2 = millis();
+  }
+  
+  if(segundos < 10)
+  {
+    text(segundos, 1282, 56);
+  }
+  else
+  {
+    text(segundos, 1271, 56);
+  }
   
   if(cont_peces_satisfechos >= 10)
   {
@@ -94,16 +122,16 @@ void draw()
       cont_peces_satisfechos++;
     }
     
-    //Si consigue 10 clientes más, consigue 1 estrella más
+    //Si consigue más clientes, consigue 1 estrella más
     if(cont_peces_satisfechos == 10)
     {
       cont_estrellas = 1;
     }
-    else if(cont_peces_satisfechos == 20)
+    else if(cont_peces_satisfechos == 15)
     {
       cont_estrellas = 2;
     }
-    else if(cont_peces_satisfechos == 30)
+    else if(cont_peces_satisfechos == 20)
     {
       cont_estrellas = 3;
     }
@@ -167,12 +195,20 @@ void draw()
       tiempo_anterior = millis();
     }
   }
+  }
 }
 
 //Si se presiona el ratón crea una cangreburguer
 void mousePressed()
 {
- creaCangreburguer(); 
+  if(comienzo == 0)
+  {
+    comienzo = 1;
+  }
+  else
+  {
+    creaCangreburguer();
+  }
 }
 
 //Si recibe un knock crea una cangreburguer
