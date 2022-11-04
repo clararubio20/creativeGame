@@ -7,33 +7,37 @@
 // conectado a un arduino
 //
 
-PImage fondo;
+PImage fondo;                                //Guarda el fondo de pantalla
 import processing.serial.*;
-ArrayList<Cangreburguer> cangreburguers;
-ArrayList<Pez_Hambriento> peces;
+ArrayList<Cangreburguer> cangreburguers;     //Guarda todas las cangreburguers que se creen
+ArrayList<Pez_Hambriento> peces;             //Guarda los 4 peces hambrientos de la escena
 Serial myPort;
-long tiempo_anterior = 0;
-long periodo = 3000;
-int[] pecesPidiendo;
-float[] _princEsp = {275,600,950,1250};
-float[] _finalEsp = {525,900,1200,1600};
-int NUM_PECES = 4;
+long tiempo_anterior = 0;                    //Guarda la última vez que un pez entró al crustaceo
+long periodo = 3000;                         //Periodo de aparición de nuevos peces
+int[] pecesPidiendo;                         //Array que guarda si los peces están en escena (1) o no están pidiendo (0)
+int NUM_PECES = 4;                           //Número de peces máximo
 
 void setup()
 {
-  size(2166,1080);
-  fondo = loadImage("fondo.jpg");
-  background(fondo);
-  cangreburguers = new ArrayList<Cangreburguer>();
-  peces = new ArrayList<Pez_Hambriento>();
+  size(2166,1080);                           //Tamaño de la imagen de fondo
+  fondo = loadImage("fondo.jpg");            //Carga la imagen de fondo
+  background(fondo);                         //Muestra la imagen de fondo
+  
+  cangreburguers = new ArrayList<Cangreburguer>();    //Crea el array de tipo cangreburguer
+  peces = new ArrayList<Pez_Hambriento>();            //Crea el array de tipo pez hambriento
+  
+  //Crea los 4 peces que participan en el juego
   for(int i= 0; i<4;i++)
   {
     creaPez_Hambriento(i);
   }
+  //Inicializa los valores de peces pidiendo a 0
   pecesPidiendo = new int[4];
-  for(int i = 0; i<4;i++){
+  for(int i = 0; i<4;i++)
+  {
     pecesPidiendo[i] = 0;
   }
+  
   printArray(Serial.list());
   myPort = new Serial(this, Serial.list()[0], 9600); 
   myPort.bufferUntil(10);
@@ -42,18 +46,42 @@ void setup()
 
 void draw()
 {
-  background(fondo);
+  background(fondo);  //Carga la imagen de fondo para que esté siempre por debajo de los objetos que se crean
+  
+  for (int i = 0; i< NUM_PECES; i++)
+  {
+    Pez_Hambriento j = peces.get(i);
+    
+    //Si los peces están en escena los redibujo
+    if(pecesPidiendo[i]==1)
+    {
+      j.draw();
+    }
+    
+    //Si han conseguido todas las cangreburguers que pedían se van
+    if(j.estoyLleno() == 1)
+    {
+      j.meVoy();
+      pecesPidiendo[i] = 0;
+    }
+  }
+  
   for (int i = 0; i<cangreburguers.size(); i++)
   {
     Cangreburguer g = cangreburguers.get(i);
     g.update();
     g.draw();
+    
+    //Si la cangreburguer llega hasta arriba se elimina
     if(g.posY()<100)
     {
       cangreburguers.remove(i);
     }
+    //Si la cangreburguer llega a la línea dónde se encuentran los personajes compruebo si es de alguien
     else if(g.posY()<400)
     {
+      //Los peces deben estar en la escena para comer
+      //Si comen se elimina la cangreburguer
       if(pecesPidiendo[0] == 1 && peces.get(0).esMia(g.posX()) == 1)
       {
         peces.get(0).ComeCangreburguer();
@@ -77,22 +105,7 @@ void draw()
     }
   }
   
-  for (int i = 0; i< NUM_PECES; i++)
-  {
-    Pez_Hambriento j = peces.get(i);
-    
-    if(pecesPidiendo[i]==1)
-    {
-      j.draw();
-    }
-    
-    if(j.estoyLleno() == 1)
-    {
-      j.meVoy();
-      pecesPidiendo[i] = 0;
-    }
-  }
-  
+  //Creamos un pez cada periodo en el espacio que no haya ninguno
   if(millis()-tiempo_anterior > periodo)
   {
     int encontrado=0;
@@ -113,11 +126,13 @@ void draw()
   }
 }
 
+//Si se presiona el ratón crea una cangreburguer
 void mousePressed()
 {
  creaCangreburguer(); 
 }
 
+//Si recibe un knock crea una cangreburguer
 void serialEvent(Serial p)
 {
   String datoS = p.readString();
@@ -129,6 +144,8 @@ void serialEvent(Serial p)
   }
 }
 
+//Crea las cangreburguers de un tamaño random, a partir de la y = 850
+//y la posición x del ratón
 void creaCangreburguer()
 {
   cangreburguers.add(new Cangreburguer(random(2,5),
@@ -139,6 +156,7 @@ void creaCangreburguer()
     println(cangreburguers.size());
 }
 
+//Crea el pez pasado por parámetro (según su posición de izquierda a derecha)
 void creaPez_Hambriento(int pez)
 {
   peces.add(new Pez_Hambriento(pez));
