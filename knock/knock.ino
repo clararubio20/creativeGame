@@ -1,7 +1,8 @@
 // these constants won't change:
 const int knockSensor = A0;  // the piezo is connected to analog pin 0
 const int threshold = 100;   // threshold value to decide when the detected sound is a knock or not
-
+long tiempo_anterior = 0;
+long periodo = 500;
 
 // these variables will change:
 int sensorReading = 0;  // variable to store the value read from the sensor pin
@@ -15,10 +16,12 @@ void loop() {
   sensorReading = analogRead(knockSensor);
 
   // if the sensor reading is greater than the threshold:
-  if (sensorReading >= threshold) {
+  if (sensorReading >= threshold && millis()-tiempo_anterior > periodo) 
+  {
     // send the string "Knock!" back to the computer, followed by newline
     Serial.println("Knock!");
     Serial.println(sensorReading);
+    tiempo_anterior = millis();
   }
   delay(50);  // delay to avoid overloading the serial port buffer
 }
