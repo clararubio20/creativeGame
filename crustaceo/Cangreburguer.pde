@@ -2,6 +2,7 @@ class Cangreburguer
 {
   PImage hamburguesa;
   float _d, _x, _y, _vx, _vy;
+  SoundFile sonido_cocinado;
   Cangreburguer(float dimension, float x, float y, float vx, float vy)
   {
     _d = dimension;
@@ -10,9 +11,10 @@ class Cangreburguer
     _vx = vx;
     _vy = vy;
   }
+  //Actualiza la posición y velocidad
   void update()
   {
-    _vy -= random(0.03, 0.05);
+    _vy -= random(0.07, 0.1);
     _vx += 0;
     _x = _x + _vx;
     _y = _y + _vy;
@@ -25,10 +27,14 @@ class Cangreburguer
     pop();
     
   }
-  float posY(){
+  //Devuelve la posición en Y de la cangreburguer
+  float posY()
+  {
     return _y;
   }
-  float posX(){
+  //Devuelve la posición en X de la cangreburguer
+  float posX()
+  {
     return _x;
   }
 }
