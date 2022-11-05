@@ -15,6 +15,10 @@ PImage[] fondo;                              //Guarda el fondo de pantalla
 int cont_estrellas = 0;                      //Contador de la puntuación
 PImage fondo_comienzo;
 int comienzo = 0;
+PImage fondo_perder;
+PImage fondo_ganar;
+int ganado = 0;
+int perdido = 0;
 int segundos = 60;
 int segundo = 1000;
 long tiempo_anterior2;                    //Guarda la última vez que un pez entró al crustaceo
@@ -38,7 +42,9 @@ void setup()
   fondo[1] = loadImage("fondo1.jpg");        //Carga la imagen de fondo con una estrella
   fondo[2] = loadImage("fondo2.jpg");        //Carga la imagen de fondo con dos estrella
   fondo[3] = loadImage("fondo3.jpg");        //Carga la imagen de fondo con tres estrella
-  background(fondo[cont_estrellas]);         //Muestra la imagen de fondo
+  //background(fondo[cont_estrellas]);         //Muestra la imagen de fondo
+  fondo_perder = loadImage("fondo_perder.jpg");
+  fondo_ganar = loadImage("fondo_ganar.jpg");
   
   textSize(35);                              //Tamaño del texto
   
@@ -74,127 +80,140 @@ void draw()
   {
     background(fondo_comienzo);
   }
+  else if(segundos <= 0)
+  {
+    if(cont_estrellas == 3)
+    {
+      ganado = 1;
+      background(fondo_ganar);
+    }
+    else
+    {
+      perdido = 1;
+      background(fondo_perder);
+    }
+  }
   else
   {
-  background(fondo[cont_estrellas]);  //Carga la imagen de fondo para que esté siempre por debajo de los objetos que se crean
-  
-  if(millis() - tiempo_anterior2 > segundo)
-  {
-    segundos--;
-    tiempo_anterior2 = millis();
-  }
-  
-  if(segundos < 10)
-  {
-    text(segundos, 1282, 56);
-  }
-  else
-  {
-    text(segundos, 1271, 56);
-  }
-  
-  if(cont_peces_satisfechos >= 10)
-  {
-    text(cont_peces_satisfechos, 1115, 60);    //Escribe el número de peces satisfechos en el marcador ajustado a valores de dos cifras
-  }
-  else 
-  {
-    text(cont_peces_satisfechos, 1127, 60);    //Escribe el número de peces satisfechos en el marcador ajustado a valores de una cifra
-  }
-  
-  for (int i = 0; i< NUM_PECES; i++)
-  {
-    Pez_Hambriento j = peces.get(i);
+    background(fondo[cont_estrellas]);  //Carga la imagen de fondo para que esté siempre por debajo de los objetos que se crean
     
-    //Si los peces están en escena los redibujo
-    if(pecesPidiendo[i]==1)
+    if(millis() - tiempo_anterior2 > segundo)
     {
-      j.draw();
+      segundos--;
+      tiempo_anterior2 = millis();
     }
     
-    //Si han conseguido todas las cangreburguers que pedían se van
-    if(j.estoyLleno() == 1)
+    if(segundos < 10)
     {
-      j.meVoy();
-      mmm = new SoundFile(this,(int)random(1,numsounds+1) + ".aiff");
-      mmm.play();
-      pecesPidiendo[i] = 0;
-      cont_peces_satisfechos++;
+      text(segundos, 1282, 56);
+    }
+    else
+    {
+      text(segundos, 1271, 56);
     }
     
-    //Si consigue más clientes, consigue 1 estrella más
-    if(cont_peces_satisfechos == 10)
+    if(cont_peces_satisfechos >= 10)
     {
-      cont_estrellas = 1;
+      text(cont_peces_satisfechos, 1115, 60);    //Escribe el número de peces satisfechos en el marcador ajustado a valores de dos cifras
     }
-    else if(cont_peces_satisfechos == 15)
+    else 
     {
-      cont_estrellas = 2;
+      text(cont_peces_satisfechos, 1127, 60);    //Escribe el número de peces satisfechos en el marcador ajustado a valores de una cifra
     }
-    else if(cont_peces_satisfechos == 20)
-    {
-      cont_estrellas = 3;
-    }
-  }
-  
-  for (int i = 0; i<cangreburguers.size(); i++)
-  {
-    Cangreburguer g = cangreburguers.get(i);
-    g.update();
-    g.draw();
     
-    //Si la cangreburguer llega hasta arriba se elimina
-    if(g.posY()<100)
+    for (int i = 0; i< NUM_PECES; i++)
     {
-      cangreburguers.remove(i);
+      Pez_Hambriento j = peces.get(i);
+      
+      //Si los peces están en escena los redibujo
+      if(pecesPidiendo[i]==1)
+      {
+        j.draw();
+      }
+      
+      //Si han conseguido todas las cangreburguers que pedían se van
+      if(j.estoyLleno() == 1)
+      {
+        j.meVoy();
+        mmm = new SoundFile(this,(int)random(1,numsounds+1) + ".aiff");
+        mmm.play();
+        pecesPidiendo[i] = 0;
+        cont_peces_satisfechos++;
+      }
+      
+      //Si consigue más clientes, consigue 1 estrella más
+      if(cont_peces_satisfechos == 10)
+      {
+        cont_estrellas = 1;
+      }
+      else if(cont_peces_satisfechos == 15)
+      {
+        cont_estrellas = 2;
+      }
+      else if(cont_peces_satisfechos == 20)
+      {
+        cont_estrellas = 3;
+      }
     }
-    //Si la cangreburguer llega a la línea dónde se encuentran los personajes compruebo si es de alguien
-    else if(g.posY()<400)
+    
+    for (int i = 0; i<cangreburguers.size(); i++)
     {
-      //Los peces deben estar en la escena para comer
-      //Si comen se elimina la cangreburguer
-      if(pecesPidiendo[0] == 1 && peces.get(0).esMia(g.posX()) == 1)
+      Cangreburguer g = cangreburguers.get(i);
+      g.update();
+      g.draw();
+      
+      //Si la cangreburguer llega hasta arriba se elimina
+      if(g.posY()<100)
       {
-        peces.get(0).ComeCangreburguer();
         cangreburguers.remove(i);
       }
-      else if(pecesPidiendo[1] == 1 && peces.get(1).esMia(g.posX()) == 1)
+      //Si la cangreburguer llega a la línea dónde se encuentran los personajes compruebo si es de alguien
+      else if(g.posY()<400)
       {
-        peces.get(1).ComeCangreburguer();
-        cangreburguers.remove(i);
-      }
-      else if(pecesPidiendo[2] == 1 && peces.get(2).esMia(g.posX()) == 1)
-      {
-        peces.get(2).ComeCangreburguer();
-        cangreburguers.remove(i);
-      }
-      else if(pecesPidiendo[3] == 1 && peces.get(3).esMia(g.posX()) == 1)
-      {
-        peces.get(3).ComeCangreburguer();
-        cangreburguers.remove(i);
+        //Los peces deben estar en la escena para comer
+        //Si comen se elimina la cangreburguer
+        if(pecesPidiendo[0] == 1 && peces.get(0).esMia(g.posX()) == 1)
+        {
+          peces.get(0).ComeCangreburguer();
+          cangreburguers.remove(i);
+        }
+        else if(pecesPidiendo[1] == 1 && peces.get(1).esMia(g.posX()) == 1)
+        {
+          peces.get(1).ComeCangreburguer();
+          cangreburguers.remove(i);
+        }
+        else if(pecesPidiendo[2] == 1 && peces.get(2).esMia(g.posX()) == 1)
+        {
+          peces.get(2).ComeCangreburguer();
+          cangreburguers.remove(i);
+        }
+        else if(pecesPidiendo[3] == 1 && peces.get(3).esMia(g.posX()) == 1)
+        {
+          peces.get(3).ComeCangreburguer();
+          cangreburguers.remove(i);
+        }
       }
     }
-  }
-  
-  //Creamos un pez cada periodo en el espacio que no haya ninguno
-  if(millis()-tiempo_anterior > periodo)
-  {
-    int encontrado=0;
-    int pez_libre = 0;
-    while((pez_libre < NUM_PECES) && (encontrado == 0))
+    
+    //Creamos un pez cada periodo en el espacio que no haya ninguno
+    if(millis()-tiempo_anterior > periodo)
     {
-      if(pecesPidiendo[pez_libre] == 0)
+      int encontrado=0;
+      int pez_libre = 0;
+      while((pez_libre < NUM_PECES) && (encontrado == 0))
       {
-        encontrado = 1;
-        pecesPidiendo[pez_libre] = 1;
+        if(pecesPidiendo[pez_libre] == 0)
+        {
+          encontrado = 1;
+          pecesPidiendo[pez_libre] = 1;
+        }
+        else
+        {
+          pez_libre++;
+        }
+        tiempo_anterior = millis();
       }
-      else
-      {
-        pez_libre++;
-      }
-      tiempo_anterior = millis();
     }
-  }
   }
 }
 
@@ -204,6 +223,14 @@ void mousePressed()
   if(comienzo == 0)
   {
     comienzo = 1;
+  }
+  else if(ganado == 1)
+  {
+    exit();
+  }
+  else if(perdido == 1)
+  {
+    exit();
   }
   else
   {
